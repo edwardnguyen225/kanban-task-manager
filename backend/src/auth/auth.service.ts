@@ -4,14 +4,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthResponse, LoginDto } from './dto/auth.dto';
+import { AuthResponse, LoginDto, RegisterDto } from './dto/auth.dto';
 import { DatabaseService } from 'src/database/database.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private databaseService: DatabaseService,
     private jwt: JwtService,
+    private users: UsersService,
   ) {}
 
   async login(data: LoginDto): Promise<AuthResponse> {
@@ -36,6 +38,14 @@ export class AuthService {
 
     return {
       token: this.jwt.sign({ email }),
+      user,
+    };
+  }
+
+  async register(data: RegisterDto): Promise<AuthResponse> {
+    const user = await this.users.create(data);
+    return {
+      token: this.jwt.sign({ email: user.email }),
       user,
     };
   }

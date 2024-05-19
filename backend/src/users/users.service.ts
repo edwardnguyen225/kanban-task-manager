@@ -33,7 +33,7 @@ export class UsersService {
     });
 
     if (existing) {
-      throw new ConflictException('username_already_exists');
+      throw new ConflictException('email_already_exists');
     }
 
     // the second argument ( 10 ) is just a "cost factor".
