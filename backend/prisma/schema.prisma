@@ -19,6 +19,7 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   Board     Board[]
+  password  String
 }
 
 model Board {
