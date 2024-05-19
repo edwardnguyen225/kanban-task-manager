@@ -18,6 +18,7 @@ model User {
   name      String
   email     String   @unique
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   Board     Board[]
   password  String
 }
@@ -26,6 +27,7 @@ model Board {
   id         String   @id
   title      String
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   owner      User     @relation(fields: [ownerId], references: [id])
   ownerId    String
   tasks      Task[]
@@ -57,6 +59,7 @@ model Task {
   title       String
   description String
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   board    Board        @relation(fields: [boardId], references: [id])
   boardId  String
