@@ -11,3 +11,12 @@ export const taskSchema = z.object({
 });
 
 export type Task = z.infer<typeof taskSchema>;
+
+export const boardSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  taskPrefix: z.string(),
+  tasks: z.array(z.string()),
+});
+
+export type Board = z.infer<typeof boardSchema>;
