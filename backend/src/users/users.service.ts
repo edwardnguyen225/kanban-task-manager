@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
-import bcrypt from 'bcrypt';
-import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -37,7 +38,8 @@ export class UsersService {
 
     // the second argument ( 10 ) is just a "cost factor".
     // the higher the cost factor, the more difficult is brute-forcing
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(data.password, salt);
 
     // Generate new uuid
     const id = uuidv4();
