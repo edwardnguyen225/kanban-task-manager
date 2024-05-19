@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthResponse, LoginDto } from './dto/auth.dto';
-import * as bcrypt from 'bcrypt';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
@@ -26,7 +25,8 @@ export class AuthService {
       throw new NotFoundException();
     }
 
-    const passwordValid = await bcrypt.compare(password, user.password);
+    // const passwordValid = await bcrypt.compareSync(password, user.password);
+    const passwordValid = user.password === password;
 
     if (!passwordValid) {
       throw new UnauthorizedException('invalid_password');

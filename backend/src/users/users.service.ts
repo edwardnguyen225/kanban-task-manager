@@ -38,8 +38,8 @@ export class UsersService {
 
     // the second argument ( 10 ) is just a "cost factor".
     // the higher the cost factor, the more difficult is brute-forcing
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(data.password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
 
     // Generate new uuid
     const id = uuidv4();
