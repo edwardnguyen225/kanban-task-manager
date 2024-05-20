@@ -21,7 +21,7 @@ import {
   TaskStatus,
   taskSchema,
 } from '@/data/schema';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useMutateTask, useUpdateTask } from '@/hooks/task';
 import {
   Select,
@@ -31,21 +31,25 @@ import {
   SelectValue,
 } from './ui/select';
 import { useDialogTask } from '@/hooks/dialog-task';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from './ui/form';
 
 export default function DialogNewTask() {
   const boardId = useParams<{ boardId: string }>().boardId;
   const mutateTask = useMutateTask();
   const updateTask = useUpdateTask();
+  const [isCreatingOrUpdating, setIsCreatingOrUpdating] = useState(false);
   const { open, setOpen, type, task } = useDialogTask((state) => state);
 
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    setValue,
-    formState: { errors },
-  } = useForm<Task>({
+  const form = useForm<Task>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       id: '',
@@ -56,33 +60,38 @@ export default function DialogNewTask() {
     },
   });
 
+  const closeDialog = () => {
+    setOpen(false);
+    form.reset();
+    form.clearErrors();
+  };
+
   useEffect(() => {
     if (type === 'edit' && task) {
-      setValue('id', task.id);
-      setValue('title', task.title);
-      setValue('priority', task.priority);
-      setValue('status', task.status);
-      setValue('label', task.label);
+      form.reset(task);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task, type]);
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = form.handleSubmit(async (data) => {
     if (type === 'edit' && task) {
       const processedData = {
         ...data,
         boardId,
       };
 
+      setIsCreatingOrUpdating(true);
       updateTask.mutate(processedData, {
         onSettled: () => {
-          setOpen(false);
+          setIsCreatingOrUpdating(false);
+          closeDialog();
         },
       });
 
       return;
     }
 
+    console.log('data', data);
     const processedData = {
       title: data.title,
       priority: data.priority,
@@ -90,14 +99,13 @@ export default function DialogNewTask() {
       label: data.label,
       boardId,
     };
+    console.log('processedData', processedData);
 
+    setIsCreatingOrUpdating(true);
     mutateTask.mutate(processedData, {
       onSettled: () => {
-        setOpen(false);
-        setValue('title', '');
-        setValue('priority', TaskPriority.LOW);
-        setValue('status', TaskStatus.BACKLOG);
-        setValue('label', TaskLabel.FEATURE);
+        setIsCreatingOrUpdating(false);
+        closeDialog();
       },
     });
   });
@@ -109,85 +117,130 @@ export default function DialogNewTask() {
           <DialogTitle>Create task</DialogTitle>
           <DialogDescription>Add a new task to your board.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
-          <div>
+        <Form {...form}>
+          <form onSubmit={onSubmit}>
             <div className="space-y-4 py-2 pb-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input placeholder="Should do this" {...register('title')} />
-                {errors.title && (
-                  <p className="text-sm text-red-500">{errors.title.message}</p>
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ACM Inc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="plan">Label</Label>
-                <Select {...register('label')} defaultValue={TaskLabel.FEATURE}>
-                  <SelectTrigger>
-                    <SelectValue aria-label={getValues('label')}>
-                      {getValues('label')}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(TaskLabel).map((label) => (
-                      <SelectItem key={label} value={label}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormField
+                control={form.control}
+                name="label"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Label</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your label" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(TaskLabel).map((label) => (
+                          <SelectItem key={label} value={label}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose a label that best describes your task.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="plan">Priority</Label>
-                <Select
-                  defaultValue={TaskPriority.LOW}
-                  {...register('priority')}
-                >
-                  <SelectTrigger>
-                    <SelectValue aria-label={getValues('priority')}>
-                      {getValues('priority')}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(TaskPriority).map((label) => (
-                      <SelectItem key={label} value={label}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select task status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(TaskStatus).map((label) => (
+                          <SelectItem key={label} value={label}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose the status of your task.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="plan">Status</Label>
-                <Select
-                  {...register('status')}
-                  defaultValue={TaskStatus.BACKLOG}
-                >
-                  <SelectTrigger>
-                    <SelectValue aria-label={getValues('status')}>
-                      {getValues('status')}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(TaskStatus).map((label) => (
-                      <SelectItem key={label} value={label}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select task priority" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(TaskPriority).map((label) => (
+                          <SelectItem key={label} value={label}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose the priority of your task.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Continue</Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button
+                disabled={isCreatingOrUpdating}
+                variant="outline"
+                onClick={closeDialog}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isCreatingOrUpdating}>
+                Continue
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -16,6 +16,10 @@ export default function TaskPage() {
 
   const setOpenDialogNewTask = useDialogTask((state) => state.setOpen);
 
+  const handleCreateTaskClick = () => {
+    setOpenDialogNewTask(true, 'new');
+  };
+
   if (!isLoadingBoards && !data?.find((board) => board.id === boardId)) {
     notFound();
   }
@@ -31,9 +35,7 @@ export default function TaskPage() {
             </p>
           </div>
           <div>
-            <Button onClick={() => setOpenDialogNewTask(true)}>
-              Create new task
-            </Button>
+            <Button onClick={handleCreateTaskClick}>Create new task</Button>
           </div>
         </div>
         <DataTable isLoading={isLoading} data={tasks ?? []} columns={columns} />
