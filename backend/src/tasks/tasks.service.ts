@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
-import { v4 as uuidv4 } from 'uuid';
 import { CreateTaskDto } from './dto/tasks.dto';
 
 @Injectable()
@@ -9,23 +8,22 @@ export class TasksService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async create(createTaskDto: CreateTaskDto) {
-    const id = uuidv4();
     const { boardId } = createTaskDto;
     const board = await this.databaseService.board.findUnique({
       where: { id: boardId },
     });
 
-    console.log('DEBUG - board', board);
     if (!board) {
       throw new NotFoundException();
     }
 
+    const taskCount = await this.databaseService.task.count({
+      where: { boardId },
+    });
     const newTask = {
-      id,
+      id: `${board.taskPrefix}-${taskCount + 1}`,
       ...createTaskDto,
     } as Prisma.TaskCreateInput;
-
-    console.log('DEBUG - newTask', newTask);
 
     return this.databaseService.task.create({
       data: newTask,
@@ -37,7 +35,9 @@ export class TasksService {
   }
 
   async findManyByBoardId(boardId: string) {
-    return this.databaseService.task.findMany({ where: { boardId } });
+    return this.databaseService.task.findMany({
+      where: { boardId, tombstone: false },
+    });
   }
 
   async findOne(id: string) {
@@ -52,8 +52,9 @@ export class TasksService {
   }
 
   async remove(id: string) {
-    const task = await this.findOne(id);
-    this.databaseService.task.delete({ where: { id } });
-    return task;
+    return this.databaseService.task.update({
+      where: { id },
+      data: { tombstone: true },
+    });
   }
 }

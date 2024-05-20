@@ -29,11 +29,13 @@ import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
 interface DataTableProps<TData, TValue> {
+  isLoading: boolean;
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
 export function DataTable<TData, TValue>({
+  isLoading,
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -113,7 +115,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {isLoading ? 'Loading...' : 'No data'}
                 </TableCell>
               </TableRow>
             )}

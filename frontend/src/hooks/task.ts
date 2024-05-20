@@ -62,3 +62,21 @@ export function useUpdateTask() {
     },
   });
 }
+
+export function useDeleteTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (taskId: string) => {
+      const response = await fetchServer(`tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+      return response.json();
+    },
+    onSuccess: (data: { boardId: string }) => {
+      queryClient.invalidateQueries({
+        queryKey: getTasksQueryKey(data.boardId),
+      });
+    },
+  });
+}

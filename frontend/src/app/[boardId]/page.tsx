@@ -2,7 +2,6 @@
 
 import { columns } from '@/components/columns';
 import { DataTable } from '@/components/data-table';
-import { taskSchema } from '@/data/schema';
 import { useParams } from 'next/navigation';
 import { useQueryBoards } from '@/hooks/board';
 import { useQueryTasks } from '@/hooks/task';
@@ -11,7 +10,7 @@ import { useDialogTask } from '@/hooks/dialog-task';
 
 export default function TaskPage() {
   const { boardId } = useParams<{ boardId: string }>();
-  const { data: tasks } = useQueryTasks(boardId);
+  const { data: tasks, isLoading } = useQueryTasks(boardId);
   const { data } = useQueryBoards();
 
   const setOpenDialogNewTask = useDialogTask((state) => state.setOpen);
@@ -34,7 +33,7 @@ export default function TaskPage() {
             </Button>
           </div>
         </div>
-        <DataTable data={tasks ?? []} columns={columns} />
+        <DataTable isLoading={isLoading} data={tasks ?? []} columns={columns} />
       </div>
     </>
   );

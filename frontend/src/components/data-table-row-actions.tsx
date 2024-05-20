@@ -21,7 +21,7 @@ import {
 import { labels } from '../data/data';
 import { taskSchema } from '../data/schema';
 import { useDialogTask } from '@/hooks/dialog-task';
-import { useMutateTask, useUpdateTask } from '@/hooks/task';
+import { useDeleteTask, useMutateTask, useUpdateTask } from '@/hooks/task';
 import { useParams } from 'next/navigation';
 
 interface DataTableRowActionsProps<TData> {
@@ -37,6 +37,7 @@ export function DataTableRowActions<TData>({
 
   const mutateTask = useMutateTask();
   const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
 
   const handleCopy = () => {
     const newTask = {
@@ -60,6 +61,14 @@ export function DataTableRowActions<TData>({
       boardId,
     };
     updateTask.mutate(updatedTask, {
+      onSettled: () => {
+        setOpen(false);
+      },
+    });
+  };
+
+  const handleDelete = () => {
+    deleteTask.mutate(task.id, {
       onSettled: () => {
         setOpen(false);
       },
@@ -104,7 +113,7 @@ export function DataTableRowActions<TData>({
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleDelete}>
           Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
