@@ -22,7 +22,7 @@ import {
   taskSchema,
 } from '@/data/schema';
 import { useParams, useRouter } from 'next/navigation';
-import { useMutateTask } from '@/hooks/task';
+import { useMutateTask, useUpdateTask } from '@/hooks/task';
 import {
   Select,
   SelectContent,
@@ -30,14 +30,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { useDialogNewTask } from '@/hooks/dialog-new-task';
+import { useDialogTask } from '@/hooks/dialog-task';
 import { useEffect } from 'react';
 
 export default function DialogNewTask() {
   const boardId = useParams<{ boardId: string }>().boardId;
-  const router = useRouter();
   const mutateTask = useMutateTask();
-  const { open, setOpen } = useDialogNewTask((state) => state);
+  const updateTask = useUpdateTask();
+  const { open, setOpen, type, task } = useDialogTask((state) => state);
 
   const {
     register,
@@ -49,7 +49,7 @@ export default function DialogNewTask() {
     resolver: zodResolver(taskSchema),
     defaultValues: {
       id: '',
-      title: 'Lorem Ipsum',
+      title: '',
       priority: TaskPriority.LOW,
       status: TaskStatus.BACKLOG,
       label: TaskLabel.FEATURE,
@@ -57,12 +57,32 @@ export default function DialogNewTask() {
   });
 
   useEffect(() => {
-    console.log('DEBUG', errors);
-
-    return () => {};
-  }, [errors]);
+    if (type === 'edit' && task) {
+      setValue('id', task.id);
+      setValue('title', task.title);
+      setValue('priority', task.priority);
+      setValue('status', task.status);
+      setValue('label', task.label);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task, type]);
 
   const onSubmit = handleSubmit(async (data) => {
+    if (type === 'edit' && task) {
+      const processedData = {
+        ...data,
+        boardId,
+      };
+
+      updateTask.mutate(processedData, {
+        onSettled: () => {
+          setOpen(false);
+        },
+      });
+
+      return;
+    }
+
     const processedData = {
       title: data.title,
       priority: data.priority,
@@ -74,7 +94,7 @@ export default function DialogNewTask() {
     mutateTask.mutate(processedData, {
       onSettled: () => {
         setOpen(false);
-        setValue('title', 'Lorem ' + new Date().toISOString());
+        setValue('title', '');
         setValue('priority', TaskPriority.LOW);
         setValue('status', TaskStatus.BACKLOG);
         setValue('label', TaskLabel.FEATURE);
@@ -121,8 +141,8 @@ export default function DialogNewTask() {
               <div className="space-y-2">
                 <Label htmlFor="plan">Priority</Label>
                 <Select
-                  {...register('priority')}
                   defaultValue={TaskPriority.LOW}
+                  {...register('priority')}
                 >
                   <SelectTrigger>
                     <SelectValue aria-label={getValues('priority')}>

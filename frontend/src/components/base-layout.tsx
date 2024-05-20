@@ -1,5 +1,5 @@
 import DialogNewBoard from './dialog-new-board';
-import DialogNewTask from './dialog-new-task';
+import DialogTask from './dialog-task';
 import { Header } from './header';
 
 export default function BaseLayout({
@@ -12,7 +12,7 @@ export default function BaseLayout({
       <Header />
       {children}
       <DialogNewBoard />
-      <DialogNewTask />
+      <DialogTask />
     </>
   );
 }

@@ -7,14 +7,14 @@ import { useParams } from 'next/navigation';
 import { useQueryBoards } from '@/hooks/board';
 import { useQueryTasks } from '@/hooks/task';
 import { Button } from '@/components/ui/button';
-import { useDialogNewTask } from '@/hooks/dialog-new-task';
+import { useDialogTask } from '@/hooks/dialog-task';
 
 export default function TaskPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const { data: tasks } = useQueryTasks(boardId);
   const { data } = useQueryBoards();
 
-  const setOpenDialogNewTask = useDialogNewTask((state) => state.setOpen);
+  const setOpenDialogNewTask = useDialogTask((state) => state.setOpen);
 
   const boardName = data?.find((board) => board.id === boardId)?.title;
 

@@ -20,6 +20,7 @@ import {
 
 import { labels } from '../data/data';
 import { taskSchema } from '../data/schema';
+import { useDialogTask } from '@/hooks/dialog-task';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -28,6 +29,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const { setOpen } = useDialogTask((state) => state);
   const task = taskSchema.parse(row.original);
 
   return (
@@ -42,7 +44,13 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            setOpen(true, 'edit', task);
+          }}
+        >
+          Edit
+        </DropdownMenuItem>
         <DropdownMenuItem>Make a copy</DropdownMenuItem>
         <DropdownMenuItem>Favorite</DropdownMenuItem>
         <DropdownMenuSeparator />

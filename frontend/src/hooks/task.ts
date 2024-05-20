@@ -16,7 +16,6 @@ export function useQueryTasks(boardId: string) {
 }
 
 export function useMutateTask() {
-  const { boardId } = useParams<{ boardId: string }>();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -34,9 +33,31 @@ export function useMutateTask() {
       });
       return response.json();
     },
-    onSuccess: (task: Task) => {
+    onSuccess: (task: Task & { boardId: string }) => {
       queryClient.invalidateQueries({
-        queryKey: getTasksQueryKey(boardId),
+        queryKey: getTasksQueryKey(task.boardId),
+      });
+    },
+  });
+}
+
+export function useUpdateTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (task: Task & { boardId: string }) => {
+      const response = await fetchServer(`tasks/${task.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(task),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.json();
+    },
+    onSuccess: (task: Task & { boardId: string }) => {
+      queryClient.invalidateQueries({
+        queryKey: getTasksQueryKey(task.boardId),
       });
     },
   });
