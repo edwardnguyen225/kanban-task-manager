@@ -30,7 +30,6 @@ model Board {
   updatedAt  DateTime @updatedAt
   // owner      User     @relation(fields: [ownerId], references: [id])
   // ownerId    String
-  tasks      Task[]
   taskPrefix String
 }
 
@@ -55,13 +54,11 @@ enum TaskPriority {
 }
 
 model Task {
-  id          String   @id
-  title       String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  board    Board        @relation(fields: [boardId], references: [id])
   boardId  String
   status   TaskStatus
   label    TaskLabel

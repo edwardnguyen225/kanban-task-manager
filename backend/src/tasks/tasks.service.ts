@@ -1,22 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateTaskDto } from './dto/tasks.dto';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(createTaskDto: Prisma.TaskCreateInput) {
+  async create(createTaskDto: CreateTaskDto) {
     const id = uuidv4();
+    const { boardId } = createTaskDto;
+    const board = await this.databaseService.board.findUnique({
+      where: { id: boardId },
+    });
+
+    console.log('DEBUG - board', board);
+    if (!board) {
+      throw new NotFoundException();
+    }
 
     const newTask = {
       id,
       ...createTaskDto,
-      createdAt: undefined,
-      ownerId: '',
-      taskPrefix: '',
-    };
+    } as Prisma.TaskCreateInput;
+
+    console.log('DEBUG - newTask', newTask);
 
     return this.databaseService.task.create({
       data: newTask,

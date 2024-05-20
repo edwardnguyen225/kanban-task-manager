@@ -1,71 +1,24 @@
 import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  CheckCircledIcon,
-  CircleIcon,
-  CrossCircledIcon,
-  QuestionMarkCircledIcon,
-  StopwatchIcon,
-} from '@radix-ui/react-icons';
+  TaskLabel,
+  TaskPriority,
+  TaskPriorityIcons,
+  TaskStatus,
+  TaskStatusIcons,
+} from './schema';
 
-export const labels = [
-  {
-    value: 'bug',
-    label: 'Bug',
-  },
-  {
-    value: 'feature',
-    label: 'Feature',
-  },
-  {
-    value: 'documentation',
-    label: 'Documentation',
-  },
-];
+export const labels = Object.values(TaskLabel).map((label) => ({
+  value: label,
+  label: label.toLowerCase(),
+}));
 
-export const statuses = [
-  {
-    value: 'backlog',
-    label: 'Backlog',
-    icon: QuestionMarkCircledIcon,
-  },
-  {
-    value: 'todo',
-    label: 'Todo',
-    icon: CircleIcon,
-  },
-  {
-    value: 'in progress',
-    label: 'In Progress',
-    icon: StopwatchIcon,
-  },
-  {
-    value: 'done',
-    label: 'Done',
-    icon: CheckCircledIcon,
-  },
-  {
-    value: 'canceled',
-    label: 'Canceled',
-    icon: CrossCircledIcon,
-  },
-];
+export const statuses = Object.values(TaskStatus).map((status) => ({
+  value: status,
+  label: status.toLowerCase().replace('_', ' '),
+  icon: TaskStatusIcons[status],
+}));
 
-export const priorities = [
-  {
-    label: 'Low',
-    value: 'low',
-    icon: ArrowDownIcon,
-  },
-  {
-    label: 'Medium',
-    value: 'medium',
-    icon: ArrowRightIcon,
-  },
-  {
-    label: 'High',
-    value: 'high',
-    icon: ArrowUpIcon,
-  },
-];
+export const priorities = Object.values(TaskPriority).map((priority) => ({
+  value: priority,
+  label: priority.toLowerCase(),
+  icon: TaskPriorityIcons[priority],
+}));
