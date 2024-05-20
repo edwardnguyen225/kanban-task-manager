@@ -1,5 +1,8 @@
 'use client';
 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { useMutateBoard } from '@/hooks/board';
 import { Button } from './ui/button';
 import {
@@ -12,17 +15,35 @@ import {
 } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
 import { useDialogNewBoard } from '@/hooks/dialog-new-board';
+import { CreateBoard, createBoardSchema } from '@/data/schema';
+import { useRouter } from 'next/navigation';
 
 export default function DialogNewBoard() {
+  const router = useRouter();
+  const mutateBoard = useMutateBoard();
   const { open, setOpen } = useDialogNewBoard((state) => state);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm<CreateBoard>({
+    resolver: zodResolver(createBoardSchema),
+  });
+
+  const onSubmit = handleSubmit(async (data) => {
+    mutateBoard.mutate(data, {
+      onSuccess: (board) => {
+        router.push(`/${board.id}`);
+      },
+      onSettled: () => {
+        setOpen(false);
+      },
+    });
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -33,42 +54,41 @@ export default function DialogNewBoard() {
             Add a new board to your workspace.
           </DialogDescription>
         </DialogHeader>
-        <div>
-          <div className="space-y-4 py-2 pb-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Board name</Label>
-              <Input id="name" placeholder="Acme Inc." />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="plan">Subscription plan</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a plan" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">
-                    <span className="font-medium">Free</span> -{' '}
-                    <span className="text-muted-foreground">
-                      Trial for two weeks
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="pro">
-                    <span className="font-medium">Pro</span> -{' '}
-                    <span className="text-muted-foreground">
-                      $9/month per user
-                    </span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+        <form onSubmit={onSubmit}>
+          <div>
+            <div className="space-y-4 py-2 pb-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Board name</Label>
+                <Input placeholder="Acme Inc." {...register('title')} />
+                {errors.title && (
+                  <p className="text-sm text-red-500">{errors.title.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="taskPrefix">Task prefix</Label>
+                <Input
+                  placeholder="ACM"
+                  {...register('taskPrefix')}
+                  onBlur={() => {
+                    const value = getValues('taskPrefix');
+                    setValue('taskPrefix', value.toUpperCase());
+                  }}
+                />
+                {errors.taskPrefix && (
+                  <p className="text-sm text-red-500">
+                    {errors.taskPrefix.message}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button type="submit">Continue</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">Continue</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -47,9 +47,6 @@ export default function BoardSwitcher({ className }: BoardSwitcherProps) {
       return;
     }
 
-    console.log('boardId', boardId);
-    console.log('boards', boards);
-
     const board = boards?.find((board) => board.id === boardId);
     setTitle(board?.title ?? 'Board');
   }, [pathname, boardId, boards]);
@@ -59,7 +56,6 @@ export default function BoardSwitcher({ className }: BoardSwitcherProps) {
   };
 
   const redirectToBoard = (boardId: string) => {
-    console.log('boardId', boardId);
     setOpen(false);
     router.push(`/${boardId}`);
   };
@@ -115,24 +111,24 @@ export default function BoardSwitcher({ className }: BoardSwitcherProps) {
                   </CommandItem>
                 ))
               ) : (
-                <CommandEmpty>No board found.</CommandEmpty>
+                <p className="cursor-default px-2 py-1.5 text-sm">
+                  No board found.
+                </p>
               )}
             </CommandGroup>
           </CommandList>
           <CommandSeparator />
           <CommandList>
             <CommandGroup>
-              <DialogTrigger asChild>
-                <CommandItem
-                  onSelect={() => {
-                    setOpen(false);
-                    setShowNewBoardDialog(true);
-                  }}
-                >
-                  <PlusCircledIcon className="mr-2 h-5 w-5" />
-                  Create Board
-                </CommandItem>
-              </DialogTrigger>
+              <CommandItem
+                onSelect={() => {
+                  setOpen(false);
+                  setShowNewBoardDialog(true);
+                }}
+              >
+                <PlusCircledIcon className="mr-2 h-5 w-5" />
+                Create Board
+              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>

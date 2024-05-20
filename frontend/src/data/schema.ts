@@ -14,9 +14,15 @@ export type Task = z.infer<typeof taskSchema>;
 
 export const boardSchema = z.object({
   id: z.string(),
-  title: z.string(),
-  taskPrefix: z.string(),
+  title: z.string().min(1).max(30),
+  taskPrefix: z.string().min(1).max(3),
   tasks: z.array(z.string()),
 });
 
 export type Board = z.infer<typeof boardSchema>;
+
+export const createBoardSchema = boardSchema.pick({
+  title: true,
+  taskPrefix: true,
+});
+export type CreateBoard = z.infer<typeof createBoardSchema>;

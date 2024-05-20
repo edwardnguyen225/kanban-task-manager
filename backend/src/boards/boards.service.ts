@@ -15,7 +15,7 @@ export class BoardsService {
       id,
       ...createBoardDto,
       createdAt: undefined,
-      ownerId: '',
+      // ownerId: '',
       taskPrefix: '',
     };
 
