@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Length } from 'class-validator';
-import { User } from '@prisma/client';
+import { User } from 'prisma/generated/client';
 
 export class LoginDto {
   @IsEmail()

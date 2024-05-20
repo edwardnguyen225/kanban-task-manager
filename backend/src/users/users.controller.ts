@@ -1,5 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User } from 'prisma/generated/client';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 

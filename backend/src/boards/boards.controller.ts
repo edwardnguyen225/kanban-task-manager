@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/client';
 import { CreateBoardDto } from './dto/create-board.dto';
 
 @Controller('boards')

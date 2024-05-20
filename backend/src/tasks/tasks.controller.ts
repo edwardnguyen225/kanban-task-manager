@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/client';
 import { CreateTaskDto } from './dto/tasks.dto';
 
 @Controller('tasks')
