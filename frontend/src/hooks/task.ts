@@ -1,3 +1,4 @@
+import { toast } from '@/components/ui/use-toast';
 import { Task } from '@/data/schema';
 import { fetchServer } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -36,6 +37,16 @@ export function useMutateTask() {
       queryClient.invalidateQueries({
         queryKey: getTasksQueryKey(task.boardId),
       });
+      toast({
+        title: '✅ Task created successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: '❌ Failed to create task',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 }
@@ -58,6 +69,16 @@ export function useUpdateTask() {
       queryClient.invalidateQueries({
         queryKey: getTasksQueryKey(task.boardId),
       });
+      toast({
+        title: '✅ Task updated successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: '❌ Failed to update task',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 }
@@ -75,6 +96,16 @@ export function useDeleteTask() {
     onSuccess: (data: { boardId: string }) => {
       queryClient.invalidateQueries({
         queryKey: getTasksQueryKey(data.boardId),
+      });
+      toast({
+        title: '✅ Task deleted successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: '❌ Failed to delete task',
+        description: error.message,
+        variant: 'destructive',
       });
     },
   });

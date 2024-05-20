@@ -51,11 +51,6 @@ export function BoardEditForm() {
   const onSubmit = form.handleSubmit(async (data) => {
     setIsUpdating(true);
     updateBoard.mutate(data, {
-      onSuccess: () => {
-        toast({
-          title: '✅ Board updated successfully',
-        });
-      },
       onSettled: () => {
         setIsUpdating(false);
       },

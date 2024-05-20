@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchServer } from '@/lib/utils';
 import { Board, CreateBoard } from '@/data/schema';
+import { toast } from '@/components/ui/use-toast';
 
 const BOARD_QUERY_KEY = ['boards'];
 
@@ -32,6 +33,16 @@ export function useMutateBoard() {
       queryClient.invalidateQueries({
         queryKey: BOARD_QUERY_KEY,
       });
+      toast({
+        title: '✅ Board created successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: '❌ Failed to create board',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 }
@@ -55,6 +66,16 @@ export function useUpdateBoard() {
     onSuccess: (board: Board) => {
       queryClient.invalidateQueries({
         queryKey: BOARD_QUERY_KEY,
+      });
+      toast({
+        title: '✅ Board updated successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: '❌ Failed to update board',
+        description: error.message,
+        variant: 'destructive',
       });
     },
   });
