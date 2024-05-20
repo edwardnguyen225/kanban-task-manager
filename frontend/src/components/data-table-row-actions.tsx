@@ -23,6 +23,7 @@ import { taskSchema } from '../data/schema';
 import { useDialogTask } from '@/hooks/dialog-task';
 import { useDeleteTask, useMutateTask, useUpdateTask } from '@/hooks/task';
 import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -74,6 +75,22 @@ export function DataTableRowActions<TData>({
       },
     });
   };
+
+  useEffect(() => {
+    // Listen to cmd + backspace to delete task
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey && event.key === 'Backspace') {
+        handleDelete();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   return (
     <DropdownMenu>
