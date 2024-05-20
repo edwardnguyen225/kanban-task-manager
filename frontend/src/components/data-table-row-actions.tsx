@@ -21,6 +21,8 @@ import {
 import { labels } from '../data/data';
 import { taskSchema } from '../data/schema';
 import { useDialogTask } from '@/hooks/dialog-task';
+import { useMutateTask } from '@/hooks/task';
+import { useParams } from 'next/navigation';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -29,8 +31,26 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const boardId = useParams<{ boardId: string }>().boardId;
   const { setOpen } = useDialogTask((state) => state);
   const task = taskSchema.parse(row.original);
+
+  const mutateTask = useMutateTask();
+
+  const handleCopy = () => {
+    const newTask = {
+      title: task.title,
+      priority: task.priority,
+      status: task.status,
+      label: task.label,
+      boardId,
+    };
+    mutateTask.mutate(newTask, {
+      onSettled: () => {
+        setOpen(false);
+      },
+    });
+  };
 
   return (
     <DropdownMenu>
@@ -51,8 +71,7 @@ export function DataTableRowActions<TData>({
         >
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
-        <DropdownMenuItem>Favorite</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleCopy}>Make a copy</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
