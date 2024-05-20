@@ -91,7 +91,6 @@ export default function DialogNewTask() {
       return;
     }
 
-    console.log('data', data);
     const processedData = {
       title: data.title,
       priority: data.priority,
@@ -99,7 +98,6 @@ export default function DialogNewTask() {
       label: data.label,
       boardId,
     };
-    console.log('processedData', processedData);
 
     setIsCreatingOrUpdating(true);
     mutateTask.mutate(processedData, {

@@ -21,13 +21,10 @@ export class TasksService {
       where: { boardId },
     });
 
-    console.log('createTaskDto', createTaskDto);
     const newTask = {
       id: `${board.taskPrefix}-${taskCount + 1}`,
       ...createTaskDto,
     } as Prisma.TaskCreateInput;
-
-    console.log('newTask', newTask);
 
     return this.databaseService.task.create({
       data: newTask,

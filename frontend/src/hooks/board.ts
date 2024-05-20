@@ -52,8 +52,6 @@ export function useUpdateBoard() {
 
   return useMutation({
     mutationFn: async (board: Board) => {
-      console.log('board', board);
-
       const response = await fetchServer(`boards/${board.id}`, {
         method: 'PATCH',
         body: JSON.stringify(board),

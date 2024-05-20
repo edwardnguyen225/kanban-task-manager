@@ -24,7 +24,6 @@ export function useMutateTask() {
         boardId: string;
       },
     ) => {
-      console.log('task', task);
       const response = await fetchServer('tasks', {
         method: 'POST',
         body: JSON.stringify(task),
