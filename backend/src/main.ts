@@ -16,9 +16,10 @@ async function bootstrap() {
   );
   app.setGlobalPrefix('api');
 
-  // Enable CORS for http://localhost:3000
+  // Enable CORS for http://localhost:3000 and https://kanban.trinhan.dev
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://kanban.trinhan.dev'],
+    credentials: true,
   });
 
   await app.listen(PORT);
