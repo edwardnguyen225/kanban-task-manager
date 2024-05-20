@@ -19,7 +19,7 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Board     Board[]
+  // Board     Board[]
   password  String
 }
 
@@ -28,8 +28,8 @@ model Board {
   title      String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  owner      User     @relation(fields: [ownerId], references: [id])
-  ownerId    String
+  // owner      User     @relation(fields: [ownerId], references: [id])
+  // ownerId    String
   tasks      Task[]
   taskPrefix String
 }
