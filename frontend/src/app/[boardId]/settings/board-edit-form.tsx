@@ -28,11 +28,13 @@ import { toast } from '@/components/ui/use-toast';
 import { Board, boardSchema, createBoardSchema } from '@/data/schema';
 import { useQueryBoards, useUpdateBoard } from '@/hooks/board';
 import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function BoardEditForm() {
   const { boardId } = useParams<{ boardId: string }>();
   const { data } = useQueryBoards();
+
+  const [isUpdating, setIsUpdating] = useState(false);
   const updateBoard = useUpdateBoard();
 
   const form = useForm<Board>({
@@ -47,18 +49,15 @@ export function BoardEditForm() {
   }, [data, boardId]);
 
   const onSubmit = form.handleSubmit(async (data) => {
+    setIsUpdating(true);
     updateBoard.mutate(data, {
       onSuccess: () => {
         toast({
-          title: 'You submitted the following values:',
-          description: (
-            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-              <code className="text-white">
-                {JSON.stringify(data, null, 2)}
-              </code>
-            </pre>
-          ),
+          title: '✅ Board updated successfully',
         });
+      },
+      onSettled: () => {
+        setIsUpdating(false);
       },
     });
   });
@@ -92,7 +91,9 @@ export function BoardEditForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Update board</Button>
+        <Button type="submit" disabled={isUpdating} className="min-w-32">
+          {isUpdating ? 'Updating...' : 'Update Board'}
+        </Button>
       </form>
     </Form>
   );

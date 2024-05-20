@@ -1,7 +1,6 @@
 import { Task } from '@/data/schema';
 import { fetchServer } from '@/lib/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
 
 const getTasksQueryKey = (boardId: string) => ['boards', boardId];
 
