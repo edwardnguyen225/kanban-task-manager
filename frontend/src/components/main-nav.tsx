@@ -34,7 +34,7 @@ export function MainNav({ className, ...props }: MainNavProps) {
           href={link.href}
           className={cn(
             'text-sm font-medium transition-colors hover:text-primary',
-            link.href === pathname && 'text-primary',
+            link.href === pathname && 'font-extrabold text-primary',
           )}
         >
           {link.text}
