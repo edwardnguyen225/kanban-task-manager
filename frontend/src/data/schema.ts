@@ -48,7 +48,7 @@ export const TaskPriorityIcons = {
 // IRL, you will have a schema for your data models.
 export const taskSchema = z.object({
   id: z.string(),
-  title: z.string().min(1).max(36),
+  title: z.string().min(1),
   status: z.string(),
   label: z.string(),
   priority: z.string(),

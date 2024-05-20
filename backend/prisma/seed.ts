@@ -10,7 +10,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 const fakeBoards = Array.from({ length: 5 }, () => ({
   id: uuidv4(),
-  title: faker.hacker.noun(),
+  title:
+    faker.hacker.noun().replace(/^./, (letter) => letter.toUpperCase()) +
+    ' ' +
+    faker.number.int({
+      min: 100,
+      max: 101,
+    }),
   taskPrefix: faker.hacker.abbreviation(),
 }));
 
