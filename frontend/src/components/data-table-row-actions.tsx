@@ -21,7 +21,7 @@ import {
 import { labels } from '../data/data';
 import { taskSchema } from '../data/schema';
 import { useDialogTask } from '@/hooks/dialog-task';
-import { useMutateTask } from '@/hooks/task';
+import { useMutateTask, useUpdateTask } from '@/hooks/task';
 import { useParams } from 'next/navigation';
 
 interface DataTableRowActionsProps<TData> {
@@ -36,6 +36,7 @@ export function DataTableRowActions<TData>({
   const task = taskSchema.parse(row.original);
 
   const mutateTask = useMutateTask();
+  const updateTask = useUpdateTask();
 
   const handleCopy = () => {
     const newTask = {
@@ -46,6 +47,19 @@ export function DataTableRowActions<TData>({
       boardId,
     };
     mutateTask.mutate(newTask, {
+      onSettled: () => {
+        setOpen(false);
+      },
+    });
+  };
+
+  const handleChangeLabel = (label: string) => {
+    const updatedTask = {
+      ...task,
+      label,
+      boardId,
+    };
+    updateTask.mutate(updatedTask, {
       onSettled: () => {
         setOpen(false);
       },
@@ -78,7 +92,11 @@ export function DataTableRowActions<TData>({
           <DropdownMenuSubContent>
             <DropdownMenuRadioGroup value={task.label}>
               {labels.map((label) => (
-                <DropdownMenuRadioItem key={label.value} value={label.value}>
+                <DropdownMenuRadioItem
+                  key={label.value}
+                  value={label.value}
+                  onClick={() => handleChangeLabel(label.value)}
+                >
                   {label.label}
                 </DropdownMenuRadioItem>
               ))}
