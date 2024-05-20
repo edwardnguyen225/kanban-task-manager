@@ -35,3 +35,27 @@ export function useMutateBoard() {
     },
   });
 }
+
+export function useUpdateBoard() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (board: Board) => {
+      console.log('board', board);
+
+      const response = await fetchServer(`boards/${board.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(board),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.json();
+    },
+    onSuccess: (board: Board) => {
+      queryClient.invalidateQueries({
+        queryKey: BOARD_QUERY_KEY,
+      });
+    },
+  });
+}

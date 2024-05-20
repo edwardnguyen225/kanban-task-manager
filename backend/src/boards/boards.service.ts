@@ -16,7 +16,6 @@ export class BoardsService {
       ...createBoardDto,
       createdAt: undefined,
       // ownerId: '',
-      taskPrefix: '',
     };
 
     return this.databaseService.board.create({
@@ -33,6 +32,29 @@ export class BoardsService {
   }
 
   async update(id: string, updateBoardDto: Prisma.BoardUpdateInput) {
+    const prevBoard = await this.findOne(id);
+    const isPrefixUpdated = updateBoardDto.taskPrefix !== prevBoard.taskPrefix;
+
+    if (isPrefixUpdated) {
+      const tasks = await this.databaseService.task.findMany({
+        where: { boardId: id },
+      });
+
+      for (const task of tasks) {
+        const newId = `${updateBoardDto.taskPrefix}-${task.id.split('-')[1]}`;
+
+        const newTask = {
+          ...task,
+          id: newId,
+        };
+
+        await this.databaseService.task.update({
+          where: { id: task.id },
+          data: newTask,
+        });
+      }
+    }
+
     return this.databaseService.board.update({
       where: { id },
       data: updateBoardDto,
